@@ -4,6 +4,8 @@ Offizielle Skills zur Integration von IURIX-Diensten in KI-Agenten.
 
 Jedes Skill ist eine reine, plattformunabhängige Markdown-Datei (`SKILL.md`), die von jedem fähigen Agenten direkt gelesen und ausgeführt werden kann.
 
+> **Für Agenten:** Zeig deinem Agent-Harness (Claude Code, OpenClaw, Hermes o. Ä.) einfach dieses Repository als Quelle. Der Einstiegspunkt ist [`AGENTS.md`](AGENTS.md) (bzw. [`CLAUDE.md`](CLAUDE.md)) — dort steht das Setup (dein IURIX API-Key) und das Routing zu den passenden Skills.
+
 ## Verfügbare Skills
 
 ### 1. RICI — Österreichische & EU-Rechtsrecherche (`/rici`)
