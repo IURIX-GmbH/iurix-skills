@@ -1,0 +1,21 @@
+name: 💡 Question / feature request
+description: Ask how to integrate a skill, or suggest an improvement.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **This is a public repository — do not include any confidential or personal
+        data.** For account/billing/API-key matters, contact support@iurix.ai instead.
+  - type: checkboxes
+    attributes:
+      label: Confidentiality
+      options:
+        - label: I confirm this issue contains no secrets, personal data, or confidential information.
+          required: true
+  - type: textarea
+    id: body
+    attributes:
+      label: Your question or idea
+    validations:
+      required: true

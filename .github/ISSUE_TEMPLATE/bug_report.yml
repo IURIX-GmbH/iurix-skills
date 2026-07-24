@@ -1,0 +1,43 @@
+name: 🐞 Bug report
+description: Something in a skill doesn't work as documented.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report! **This is a public repository — do not include any
+        confidential or personal data** (no API keys, no internal identifiers, no
+        customer data). For security issues use private reporting instead (see SECURITY.md).
+  - type: checkboxes
+    attributes:
+      label: Confidentiality
+      options:
+        - label: I confirm this issue contains no secrets, personal data, or confidential information.
+          required: true
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Affected skill
+      options:
+        - rici
+        - rita
+        - other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: A minimal, non-sensitive example (redact any keys/data).
+  - type: input
+    id: client
+    attributes:
+      label: Agent / MCP client
+      description: e.g. Claude Code, custom Python MCP client, …

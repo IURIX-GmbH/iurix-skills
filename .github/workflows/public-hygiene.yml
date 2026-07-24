@@ -1,0 +1,71 @@
+name: public-hygiene
+
+# Fails the PR if internal-only references leak into this PUBLIC repo — in
+# changed files, commit messages, or the PR title/body. Discipline is the
+# primary control; this is the automated safety net.
+
+on:
+  pull_request:
+    # include 'edited' so that editing the PR title/body is re-scanned too
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+jobs:
+  no-internal-refs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for internal references
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -uo pipefail
+
+          # Internal markers that must never appear in this public repo.
+          # NOTE: public endpoints (api.iurix.ai, mcp.iurix.ai) and the product
+          # names RICI/RITA/FIRE are intentionally NOT matched.
+          PATTERNS='iurix-backend|/data/iurix|Mega-DB|ssh rici|-ARCHITEKTUR|MCP-CONNECT|CLAUDE_DESKTOP_CONFIG|_VALID_SOURCES'
+
+          fail=0
+
+          echo "::group::Changed files"
+          # Exclude this workflow itself — it necessarily lists the patterns.
+          files=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" -- . ':(exclude).github/workflows/public-hygiene.yml')
+          for f in $files; do
+            [ -f "$f" ] || continue
+            if grep -nEI "$PATTERNS" "$f"; then
+              echo "::error file=$f::Internal reference found in $f"
+              fail=1
+            fi
+          done
+          echo "::endgroup::"
+
+          echo "::group::Commit messages"
+          if git log --format='%H %s%n%b' "$BASE_SHA..$HEAD_SHA" | grep -nE "$PATTERNS"; then
+            echo "::error::Internal reference found in a commit message"
+            fail=1
+          fi
+          echo "::endgroup::"
+
+          echo "::group::PR title / body"
+          if printf '%s\n%s' "$PR_TITLE" "$PR_BODY" | grep -nE "$PATTERNS"; then
+            echo "::error::Internal reference found in the PR title or description"
+            fail=1
+          fi
+          echo "::endgroup::"
+
+          if [ "$fail" -ne 0 ]; then
+            echo ""
+            echo "Public-repo hygiene check FAILED — remove the internal references above before merging."
+            echo "See CONTRIBUTING.md for what must stay out of this public repository."
+            exit 1
+          fi
+          echo "OK — no internal references detected."
