@@ -6,6 +6,8 @@ name: public-hygiene
 
 on:
   pull_request:
+    # include 'edited' so that editing the PR title/body is re-scanned too
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
