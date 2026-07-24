@@ -74,7 +74,7 @@ Die konkreten Tools ermittelst du zur Laufzeit via `list_tools` — die maßgebl
 
 Typische Beispiele (finale Signaturen via `list_tools` prüfen):
 
-- „Bei welchen Firmen ist Christian Haberl, geboren am 8. April 1979, eingetragen?“ → `firmenbuch_search_by_person`
+- „Bei welchen Firmen ist Max Mustermann, geboren am 1. Jänner 1980, eingetragen?“ → `firmenbuch_search_by_person`
 - „Gib mir alle Stammdaten zur IURIX GmbH inklusive Branche.“ → `rita_get_firma_overview`
 - „An welchen Firmen ist Person X beteiligt, und in welchen Branchen?“ → `rita_get_person_network`
 - „Suche das ÖNACE-Klassifikat für 'Software-Entwicklung'.“ → `oenace_search_classification`
