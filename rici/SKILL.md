@@ -1,7 +1,7 @@
 ---
 name: rici
-backend_version: ">=0.16.1"
-description: RICI — Österreichische Rechtsrecherche (Bundesrecht + Judikatur + Findok Steuerrecht). Durchsucht das RIS und BMF-Dokumente via RICI API. Verwende bei JEDER Rechtsfrage zu österreichischem Recht. Keine Web-Suche verwenden.
+backend_version: ">=0.55.0"
+description: RICI — Österreichische & EU-Rechtsrecherche (Bundesrecht, Judikatur, Findok Steuerrecht, Landesrecht, Gesetzesmaterialien, Kollektivverträge, EU-Recht/EUR-Lex, EuGH- und EGMR-Judikatur). Durchsucht RIS, BMF und EU-Quellen via RICI API. Verwende bei JEDER Rechtsfrage zu österreichischem oder EU-Recht. Keine Web-Suche verwenden.
 ---
 
 # RICI — Österreichische Rechtsrecherche via API
@@ -34,10 +34,30 @@ curl -s -X POST "$API_URL/query" \
 ```
 
 **WICHTIG:** 
-- `mode` sollte standardmäßig immer `"auto"` sein. Der RICI API Router entscheidet dann selbst, in welchen Datenbanken er sucht.
-- Falls der User explizit eine bestimmte Quelle durchsuchen möchte (z.B. "Suche nur in der Judikatur"), setze `"mode": "single"` und gib den Namen der gewünschten Collection im Feld `collection` mit (z.B. `"collection": "ris_judikatur"`).
-- Falls der User mehrere explizite Quellen gleichzeitig durchsuchen möchte (z.B. "Suche in Findok und Bundesrecht"), setze ebenfalls `"mode": "single"` und übergib eine Liste im Feld `collections` (z.B. `"collections": ["findok", "ris_bundesrecht"]`).
-Gültige Collections sind: `ris_bundesrecht`, `ris_judikatur`, `findok`, `eurlex_de`.
+- `mode` sollte standardmäßig immer `"auto"` sein. Der RICI API Router entscheidet dann selbst, in welchen Datenbanken er sucht. Im Auto-Modus wird jede mitgegebene Quellen-Liste ignoriert.
+- Falls der User explizit bestimmte Quellen durchsuchen möchte, setze `"mode": "explicit"` und übergib die gewünschten Quellen als Liste im Feld `sources`.
+  - Eine Quelle (z.B. "Suche nur in der Judikatur"): `{"mode": "explicit", "sources": ["ris_judikatur"]}`
+  - Mehrere Quellen (z.B. "Suche in Findok und Bundesrecht"): `{"mode": "explicit", "sources": ["findok", "ris_bundesrecht"]}`
+  - Wird `mode: "explicit"` ohne (oder mit leerer) `sources`-Liste gesendet, fällt die Anfrage automatisch auf `auto` zurück. Der tatsächlich gelaufene Modus und die Quellen stehen in der Response.
+
+**Gültige `sources` (Collections):**
+
+| Quelle | Inhalt |
+|---|---|
+| `ris_bundesrecht` | Bundesrecht (geltende Gesetze/Verordnungen) |
+| `ris_judikatur` | Österreichische Judikatur (OGH, VwGH, VfGH u.a.) |
+| `findok` | BMF Findok (Steuerrecht, Richtlinien, Erlässe) |
+| `ris_landesrecht` | Landesrecht der neun Bundesländer |
+| `ris_materialien` | Gesetzesmaterialien (Regierungsvorlagen, EB u.a.) |
+| `kollektivvertraege` | Kollektivverträge (WKO) |
+| `eurlex` | EU-Recht / EUR-Lex |
+| `curia` | EuGH-Judikatur (Curia) |
+| `hudoc` | EGMR-Judikatur (HUDOC) |
+
+**Hinweise zur Kompatibilität:**
+- Die alten Felder `collection` (Einzelwert) und `collections` (Liste) sowie die alten Modi `"single"`/`"multi"` funktionieren weiterhin, sind aber **deprecated** — sie werden serverseitig auf `mode: "explicit"` + `sources` normalisiert. Verwende für neue Aufrufe `mode` + `sources`.
+- Der alte Quellenname `eurlex_de` wird weiterhin akzeptiert und intern auf `eurlex` normalisiert.
+- Bei angemeldeten Usern (JWT) wird die fertige Antwort standardmäßig zusätzlich per E-Mail zugestellt. Für API-Key-Aufrufe ist das ein No-op. Zum Deaktivieren `"send_email": false` mitgeben.
 
 **Response (JSON):**
 Die Response enthält eine `job_id` und den Status `running`. Merke dir die `job_id`.
