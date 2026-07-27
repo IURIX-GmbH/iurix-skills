@@ -1,9 +1,7 @@
 # Dünner Aufrufer je Repo: .github/workflows/ai-reviews.yml
-# Die Review-Logik liegt ZENTRAL in IURIX-GmbH/.github
-# (.github/workflows/requesty-review.yml). Diese Datei NICHT erweitern;
-# Änderungen am Review immer im zentralen Repo.
-# Modellwahl: hier pro Job via policy/*-Alias (Requesty-Policy entscheidet
-# die konkrete Modellversion — nie versionierte IDs pinnen).
+# Die Review-Logik UND die Modellliste liegen ZENTRAL in IURIX-GmbH/.github
+# (.github/workflows/ai-reviews.yml — GPT, Gemini, DeepSeek, GLM via Requesty).
+# Diese Datei NICHT erweitern; Reviewer/Modelle immer im zentralen Repo ändern.
 name: AI Reviews (via Requesty)
 on:
   pull_request:
@@ -12,28 +10,12 @@ on:
     types: [created]
 
 jobs:
-  gpt:
+  ai:
     permissions:
       contents: read
       pull-requests: write
       issues: write
       id-token: write
       actions: read
-    uses: IURIX-GmbH/.github/.github/workflows/requesty-review.yml@main
-    with:
-      model: policy/gpt
-      mention: "@gpt review"
-    secrets: inherit
-
-  deepseek:
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-      id-token: write
-      actions: read
-    uses: IURIX-GmbH/.github/.github/workflows/requesty-review.yml@main
-    with:
-      model: policy/deepseek-latest-eu
-      mention: "@deepseek review"
+    uses: IURIX-GmbH/.github/.github/workflows/ai-reviews.yml@main
     secrets: inherit
